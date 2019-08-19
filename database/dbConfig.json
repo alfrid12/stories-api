@@ -1,0 +1,7 @@
+{
+    "databaseUrl": "localhost",
+    "databaseName": "stories",
+    "port": 5432,
+    "user": "postgres",
+    "password": "password"
+}
