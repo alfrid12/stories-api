@@ -9,16 +9,15 @@ DROP TABLE IF EXISTS "sprints";
 DROP TABLE IF EXISTS "teams";
 
 CREATE TABLE "teams" (
-    "id" SERIAL PRIMARY KEY,
+    "id" VARCHAR(10) PRIMARY KEY,
     "name" VARCHAR(100) NOT NULL,
-    "abbreviation" VARCHAR(5) NOT NULL UNIQUE,
     "userGroup" VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE "sprints" (
     "id" SERIAL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
-    "teamId" INT REFERENCES "teams"(id) NOT NULL,
+    "teamId" VARCHAR(10) REFERENCES "teams"(id) NOT NULL,
     "startTimestamp" BIGINT,
     "endTimestamp" BIGINT
 );
@@ -29,14 +28,13 @@ CREATE TABLE "storyStatuses" (
 );
 
 CREATE TABLE "stories" (
-    "id" SERIAL PRIMARY KEY,
+    "id" VARCHAR(20) PRIMARY KEY,
     "createdBy" VARCHAR(30) NOT NULL,
-    "storyNumber" INT NOT NULL,
     "title" VARCHAR(500) NOT NULL,
     "statusId" INT REFERENCES "storyStatuses"(id) NOT NULL,
-    "teamId" INT REFERENCES "teams"(id) NOT NULL,
+    "teamId" VARCHAR(10) REFERENCES "teams"(id) NOT NULL,
     "createdTimestamp" BIGINT NOT NULL,
-    "parentId" INT REFERENCES "stories"(id),
+    "parentId" VARCHAR(20) REFERENCES "stories"(id),
     "description" VARCHAR(10000),
     "acceptanceCriteria" VARCHAR(10000),
     "resolvedTimestamp" BIGINT,
@@ -45,7 +43,7 @@ CREATE TABLE "stories" (
 
 CREATE TABLE "storyComments" (
     "id" SERIAL PRIMARY KEY,
-    "storyId" INT NOT NULL REFERENCES "stories"(id),
+    "storyId" VARCHAR(20) NOT NULL REFERENCES "stories"(id),
     "userId" VARCHAR(50) NOT NULL,
     "text" VARCHAR(1000) NOT NULL,
     "createdTimestamp" BIGINT NOT NULL
@@ -53,13 +51,13 @@ CREATE TABLE "storyComments" (
 
 CREATE TABLE "storyPlanning" (
     "id" SERIAL PRIMARY KEY,
-    "storyId" INT REFERENCES "stories"(id) NOT NULL,
+    "storyId" VARCHAR(20) REFERENCES "stories"(id) NOT NULL,
     "sprintId" INT REFERENCES "sprints"(id) NOT NULL
 );
 
 CREATE TABLE "storyAssignees" (
     "id" SERIAL PRIMARY KEY,
-    "storyId" INT REFERENCES "stories"(id) NOT NULL,
+    "storyId" VARCHAR(20) REFERENCES "stories"(id) NOT NULL,
     "userId" VARCHAR(30) NOT NULL
 );
 
