@@ -9,7 +9,7 @@ const databaseConfig = require('./dbConfig.json')
 const getAllTeams = callback => {
     connectToDb(client => {
         let sql = `SELECT * FROM teams;`;
-        
+
         client.query(sql, (error, result) => {
             client.end();
             callback(error, result);
@@ -21,7 +21,6 @@ const getAllStories = callback => {
     connectToDb(client => {
         let sql = `SELECT s.id,
                           s."createdBy",
-                          s."storyNumber",
                           s.title,
                           s."statusId",
                           s."teamId",
@@ -31,11 +30,9 @@ const getAllStories = callback => {
                           s."acceptanceCriteria",
                           s."resolvedTimestamp",
                           s."storyPoints",
-                          t.abbreviation AS "teamAbbreviation",
                           ss.name AS "statusName"
-                   FROM stories AS s, teams AS t, "storyStatuses" AS ss
-                   WHERE s."teamId" = t.id AND
-                         s."statusId" = "ss".id;`;
+                   FROM stories AS s, "storyStatuses" AS ss
+                   WHERE s."statusId" = "ss".id;`;
 
         client.query(sql, (error, result) => {
             client.end();
@@ -48,7 +45,7 @@ const getStoriesByTeamId = (teamId, callback) => {
     connectToDb(client => {
         let sql = `SELECT * FROM stories
                    WHERE stories."teamId" = $1;`;
-            
+
         client.query(sql, [teamId], (error, result) => {
             client.end();
             callback(error, result);
@@ -56,28 +53,24 @@ const getStoriesByTeamId = (teamId, callback) => {
     });
 }
 
-const getStoryByStoryName = (storyName, callback) => {
-
-    const storyNumber = getStoryNumberFromStoryName(storyName);
-    const teamAbbreviation = getTeamAbbreviationFromStoryName(storyName);
+const getStoryById = (storyId, callback) => {
 
     connectToDb(client => {
-        let sql = `SELECT s.id,
-                          s."statusId",
-                          s.title,
-                          s.description,
-                          s."acceptanceCriteria",
-                          s."teamId",
-                          s."createdTimestamp",
-                          s."storyPoints",
-                          t.name AS "teamName",
-                          t.abbreviation AS "teamAbbreviation"
-                   FROM stories AS s, teams AS t
-                   WHERE s."storyNumber" = $1 AND
-                         t.abbreviation = $2 AND
-                         s."teamId" = t."id";`;
+        let sql = `SELECT * FROM stories
+                   WHERE stories.id = $1;`;
 
-        client.query(sql, [storyNumber, teamAbbreviation], (error, result) => {
+        client.query(sql, [storyId], (error, result) => {
+            client.end();
+            callback(error, result);
+        });
+    });
+}
+
+const getAllSprints = callback => {
+    connectToDb(client => {
+        let sql = `SELECT * FROM sprints;`;
+
+        client.query(sql, [], (error, result) => {
             client.end();
             callback(error, result);
         });
@@ -96,21 +89,6 @@ const getSprintsByTeamId = (teamId, callback) => {
     });
 }
 
-const getSprintsByTeamAbbreviation = (teamAbbreviation, callback) => {
-    connectToDb(client => {
-        let sql = `SELECT s.id, s.name, s."teamId", s."startTimestamp", s."endTimestamp"
-                   FROM sprints AS s, teams AS t
-                   WHERE s."teamId" = t.id AND
-                   t."abbreviation" = $1;`;
-
-        client.query(sql, [teamAbbreviation], (error, result) => {
-            client.end();
-            callback(error, result);
-        });
-    });
-}
-
-
 const getAllStoryStatuses = callback => {
     connectToDb(client => {
         let sql = `SELECT * FROM "storyStatuses";`;
@@ -121,11 +99,12 @@ const getAllStoryStatuses = callback => {
     });
 }
 
+// Work in progress
 const getFavoritesByUserId = (userId, callback) => {
     connectToDb(client => {
         let sql = `SELECT * FROM favorites
                    WHERE favorites."userId" = $1;`;
-        
+
         client.query(sql, [userId], (error, result) => {
             client.end();
             callback(error, result);
@@ -135,9 +114,9 @@ const getFavoritesByUserId = (userId, callback) => {
 
 const insertNewTeam = (team, callback) => {
     connectToDb(client => {
-        let sql = `INSERT INTO teams (name, abbreviation, userGroup, storyCounter)
-                   VALUES ($1, $2, $3, $4);`;
-        const values = [team.name, team.abbreviation, team.userGroup, 0];
+        let sql = `INSERT INTO teams (id, name, userGroup)
+                   VALUES ($1, $2, $3);`;
+        const values = [team.id, team.name, team.userGroup];
 
         client.query(sql, values, (error, result) => {
             client.end();
@@ -219,7 +198,7 @@ const updateExistingStory = (story, callback) => {
                    WHERE stories.id = $8`;
 
         const values = [
-            story.title, story.statusId, story.teamId, story.parentId, 
+            story.title, story.statusId, story.teamId, story.parentId,
             story.description, story.acceptanceCriteria, story.storyPoints, story.id
         ];
 
@@ -266,30 +245,17 @@ const connectToDb = callback => {
 
 const handleDatabaseError = error => console.log(error);
 
-const getStoryNumberFromStoryName = storyName => {
-    const indexOfHyphen = storyName.indexOf('-');
-    const storyNumber = storyName.substring(indexOfHyphen + 1, storyName.length);
-    return storyNumber;
-}
-
-const getTeamAbbreviationFromStoryName = storyName => {
-    const indexOfHyphen = storyName.indexOf('-');
-    const teamAbbreviation = storyName.substring(0, indexOfHyphen);
-    return teamAbbreviation;
-}
-
-
 module.exports = {
     getAllTeams,
-    getAllStories,
-    getSprintsByTeamId,
-    getSprintsByTeamAbbreviation,
-    getStoriesByTeamId,
     insertNewTeam,
+    getAllStories,
+    getStoriesByTeamId,
+    getStoryById,
     insertNewStory,
-    insertNewSprint,
     updateExistingStory,
-    getStoryByStoryName,
+    getAllSprints,
+    getSprintsByTeamId,
+    insertNewSprint,
     getAllStoryStatuses,
     getSidebarInfo
 };

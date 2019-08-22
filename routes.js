@@ -37,11 +37,11 @@ router.get('/stories', (request, response) => {
     });
 });
 
-router.get('/stories/:storyName', (request, response) => {
+router.get('/stories/:storyId', (request, response) => {
 
-    const storyName = request.params.storyName;
+    const storyId = request.params.storyId;
 
-    DatabaseService.getStoryByStoryName(storyName, (error, result) => {
+    DatabaseService.getStoryById(storyId, (error, result) => {
         if (error) handleError(error);
         else response.send(result.rows[0]);
     });
@@ -52,7 +52,6 @@ router.get('/sprints', (request, response) => {
 
     // Check for query parameters in request URL
     const teamId = request.query.teamId;
-    const teamAbbr = request.query.teamAbbr;
 
     // If teamId is present, send sprints belonging to that team
     if (teamId) {
@@ -60,15 +59,9 @@ router.get('/sprints', (request, response) => {
             if (error) handleError(error);
             else response.send(result.rows);
         });
-    } else if (teamAbbr) {
-        DatabaseService.getSprintsByTeamAbbreviation(teamAbbr, (error, result) => {
-            if (error) handleError(error);
-            else response.send(result.rows);
-        });
-    }
 
     // Otherwise, send all sprints
-    else DatabaseService.getAllSprints((error, result) => {
+    } else DatabaseService.getAllSprints((error, result) => {
         if (error) handleError(error);
         else response.send(result.rows);
     });
