@@ -26,7 +26,7 @@ const getAllStories = callback => {
                           s."teamId",
                           s."createdTimestamp",
                           s."parentId",
-                          s.description,
+                          s.notes,
                           s."acceptanceCriteria",
                           s."resolvedTimestamp",
                           s."storyPoints",
@@ -164,7 +164,7 @@ const insertNewStory = (story, callback) => {
                         "teamId",
                         "createdTimestamp",
                         "parentId",
-                        "description",
+                        "notes",
                         "acceptanceCriteria",
                         "storyPoints"
                     ) VALUES  ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`;
@@ -177,7 +177,7 @@ const insertNewStory = (story, callback) => {
                     story.teamId,
                     Date.now(),
                     story.parentId,
-                    story.description,
+                    story.notes,
                     story.acceptanceCriteria,
                     story.storyPoints
                 ];
@@ -195,14 +195,14 @@ const updateExistingStory = (story, callback) => {
                        "statusId" = $2,
                        "teamId" = $3,
                        "parentId" = $4,
-                       description = $5,
+                       notes = $5,
                        "acceptanceCriteria" = $6,
                        "storyPoints" = $7
                    WHERE stories.id = $8`;
 
         const values = [
             story.title, story.statusId, story.teamId, story.parentId,
-            story.description, story.acceptanceCriteria, story.storyPoints, story.id
+            story.notes, story.acceptanceCriteria, story.storyPoints, story.id
         ];
 
         client.query(sql, values, (error, response) => {

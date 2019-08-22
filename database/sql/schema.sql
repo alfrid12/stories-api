@@ -35,7 +35,7 @@ CREATE TABLE "stories" (
     "teamId" VARCHAR(10) REFERENCES "teams"(id) NOT NULL,
     "createdTimestamp" BIGINT NOT NULL,
     "parentId" VARCHAR(20) REFERENCES "stories"(id),
-    "description" VARCHAR(10000),
+    "notes" VARCHAR(10000),
     "acceptanceCriteria" VARCHAR(10000),
     "resolvedTimestamp" BIGINT,
     "storyPoints" INT
