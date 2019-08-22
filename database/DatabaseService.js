@@ -151,11 +151,14 @@ const insertNewStory = (story, callback) => {
                 /*  The new story's number will be the number of stories
                 under that team plus one. Ex.- there are already three stories,
                 new story will be #4    */
-                const storyNumber = parseInt(response.rows[0].count) + 1;
+                const newStoryNumber = parseInt(response.rows[0].count) + 1;
+                const newStoryId = story.teamId + '-' + newStoryNumber
+
+                console.log(newStoryNumber);
 
                 sql = `INSERT INTO stories (
+                        "id",
                         "createdBy",
-                        "storyNumber",
                         "title",
                         "statusId",
                         "teamId",
@@ -167,8 +170,8 @@ const insertNewStory = (story, callback) => {
                     ) VALUES  ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`;
 
                 const values = [
+                    newStoryId,                    
                     story.createdBy,
-                    storyNumber,
                     story.title,
                     story.statusId,
                     story.teamId,

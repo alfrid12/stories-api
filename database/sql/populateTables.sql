@@ -15,7 +15,7 @@ INSERT INTO sprints ("name", "teamId") VALUES
 ('ABC team sprint 1', 'ABC'),
 ('ABC team sprint 2', 'ABC'),
 ('DEF sprint', 'DEF'),
-('Alex"s first sprint', 'ABF');
+('Alex''s first sprint', 'ABF');
 
 INSERT INTO stories ("id", "createdBy", "title", "statusId", "teamId", "createdTimestamp", "description", "acceptanceCriteria") VALUES
 ('ABC-1', 'n0350204', 'Test story 1', 1, 'ABC', 1561110953, 'description 1', 'acceptance criteria 1'),
