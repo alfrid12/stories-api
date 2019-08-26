@@ -154,8 +154,6 @@ const insertNewStory = (story, callback) => {
                 const newStoryNumber = parseInt(response.rows[0].count) + 1;
                 const newStoryId = story.teamId + '-' + newStoryNumber
 
-                console.log(newStoryNumber);
-
                 sql = `INSERT INTO stories (
                         "id",
                         "createdBy",

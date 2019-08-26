@@ -7,17 +7,17 @@ INSERT INTO "storyStatuses" (name) VALUES
 ('Closed');
 
 INSERT INTO "teams" ("id", "name", "userGroup") VALUES 
-('ABC', 'The ABC team', 'ldap group 1'),
-('DEF', 'The DEF team', 'ldap group 2'),
+('UND', 'The Undergrads', 'ldap group 1'),
+('GSA', 'Grad School Applications', 'ldap group 2'),
 ('ABF', 'TEAM ALEX', 'ldap group 3');
 
 INSERT INTO sprints ("name", "teamId") VALUES 
-('ABC team sprint 1', 'ABC'),
-('ABC team sprint 2', 'ABC'),
-('DEF sprint', 'DEF'),
+('Undergrads 1.1', 'ABC'),
+('Undergrads 1.2', 'ABC'),
+('Grad School 1.1', 'DEF'),
 ('Alex''s first sprint', 'ABF');
 
 INSERT INTO stories ("id", "createdBy", "title", "statusId", "teamId", "createdTimestamp", "notes", "acceptanceCriteria") VALUES
-('ABC-1', 'n0350204', 'Test story 1', 1, 'ABC', 1561110953, 'notes 1', 'acceptance criteria 1'),
-('ABC-2', 'n0350204', 'Test story 2', 1, 'ABC', 1561110953, 'notes 2', 'acceptance criteria 1'),
-('DEF-1', 'n0350204', 'Test story 3', 1, 'DEF', 1561110953, 'notes 3', 'acceptance criteria 3');
+('UND-1', 'n0350204', 'Choose front end framework', 1, 'UND', 1561110953, 'Options: Angular, Vue', 'A front end framework has been chosen'),
+('UND-2', 'n0350204', 'Choose back end stack', 1, 'UND', 1561110953, 'Options: Django, Spoot, Scala, Go, MySQL, MongoDB', 'A backend language, framework, and database has been chosen'),
+('GSA-1', 'n0350204', 'Choose potential schools', 3, 'GSA', 1561110953, 'So far: Illinois, UMD, University of Michigan, Ann Arbor, Northeastern', 'A definitive list of grad schools has been chosen');
