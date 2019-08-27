@@ -53,6 +53,31 @@ const getStoriesByTeamId = (teamId, callback) => {
     });
 }
 
+const getStoriesByCreatorId = (creatorId, callback) => {
+    connectToDb(client => {
+        let sql = `SELECT * FROM stories 
+                   WHERE stories."createdBy" = $1;`;
+
+        client.query(sql, [creatorId], (error, result) => {
+            client.end();
+            callback(error, result);
+        });
+    });
+}
+
+const getStoriesByAssigneeId = (assigneeId, callback) => {
+    connectToDb(client => {
+        let sql = `SELECT * FROM "storyAssignees", stories
+                   WHERE "storyAssignees"."userId" = $1 AND 
+                   stories.id = "storyAssignees"."storyId";`;
+
+        client.query(sql, [assigneeId], (error, result) => {
+            client.end();
+            callback(error, result);
+        });
+    });
+}
+
 const getStoryById = (storyId, callback) => {
 
     connectToDb(client => {
@@ -93,19 +118,6 @@ const getAllStoryStatuses = callback => {
     connectToDb(client => {
         let sql = `SELECT * FROM "storyStatuses";`;
         client.query(sql, (error, result) => {
-            client.end();
-            callback(error, result);
-        });
-    });
-}
-
-// Work in progress
-const getFavoritesByUserId = (userId, callback) => {
-    connectToDb(client => {
-        let sql = `SELECT * FROM favorites
-                   WHERE favorites."userId" = $1;`;
-
-        client.query(sql, [userId], (error, result) => {
             client.end();
             callback(error, result);
         });
@@ -196,7 +208,7 @@ const updateExistingStory = (story, callback) => {
                        notes = $5,
                        "acceptanceCriteria" = $6,
                        "storyPoints" = $7
-                   WHERE stories.id = $8`;
+                   WHERE stories.id = $8;`;
 
         const values = [
             story.title, story.statusId, story.teamId, story.parentId,
@@ -210,14 +222,11 @@ const updateExistingStory = (story, callback) => {
     });
 }
 
-// Query stories for assigned to and created by
-// Query favorites
-const getSidebarInfo = (userId, callback) => {
+const getFavoritesByUserId = (userId, callback) => {
     connectToDb(client => {
+        let sql = `SELECT * FROM favorites WHERE favorites."userId" = $1;`;
 
-        let sql = ``;
-
-        client.query(sql, [], (error, response) => {
+        client.query(sql, [userId], (error, response) => {
             client.end();
             callback(error, response);
         });
@@ -251,6 +260,8 @@ module.exports = {
     insertNewTeam,
     getAllStories,
     getStoriesByTeamId,
+    getStoriesByCreatorId,
+    getStoriesByAssigneeId,
     getStoryById,
     insertNewStory,
     updateExistingStory,
@@ -258,5 +269,5 @@ module.exports = {
     getSprintsByTeamId,
     insertNewSprint,
     getAllStoryStatuses,
-    getSidebarInfo
+    getFavoritesByUserId
 };

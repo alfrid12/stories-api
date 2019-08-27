@@ -13,12 +13,26 @@ router.get('/stories', (request, response) => {
 
     // Extract teamId from URL
     const teamId = request.query.teamId;
+    const creatorId = request.query.creatorId;
+    const assigneeId = request.query.assigneeId;
 
     // If teamId is specified, send stories belonging to that team
-    if (teamId) DatabaseService.getStoriesByTeamId(teamId, (error, result) => {
-        if (error) handleError(error);
-        else response.send(result.rows);
-    });
+    if (teamId) {
+        DatabaseService.getStoriesByTeamId(teamId, (error, result) => {
+            if (error) handleError(error);
+            else response.send(result.rows);
+        });
+    } else if (creatorId) {
+        DatabaseService.getStoriesByCreatorId(creatorId, (error, result) => {
+            if (error) handleError(error);
+            else response.send(result.rows);
+        });
+    } else if (assigneeId) {
+        DatabaseService.getStoriesByAssigneeId(assigneeId, (error, result) => {
+            if (error) handleError(error);
+            else response.send(result.rows);
+        });
+    }
 
     // Otherwise, send all stories
     else DatabaseService.getAllStories((error, result) => {
@@ -48,6 +62,7 @@ router.post('/stories', jsonParser, (request, response) => {
     });
 });
 
+// Route for updating existing story
 router.post('/stories/:storyId', (request, response) => {
     const story = request.body;
     DatabaseService.updateExistingStory(story, (error, updateResult) => {
@@ -96,14 +111,16 @@ router.get('/statuses', (request, response) => {
     });
 });
 
-router.get('/sidebar/:userId', (request, response) => {
+router.get('/favorites/:userId', (request, response) => {
+
+    // Extract userId from URL
     const userId = request.params.userId;
-    DatabaseService.getSidebarInfo(userId, (error, result) => {
+    
+    DatabaseService.getFavoritesByUserId(userId, (error, result) => {
         if (error) handleError(error);
-        else response.send(result);
+        else response.send(result.rows);
     });
 });
-
 
 const handleError = error => console.log("ERROR: " + error);
 
