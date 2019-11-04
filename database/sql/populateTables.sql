@@ -26,6 +26,6 @@ INSERT INTO stories ("id", "createdBy", "title", "statusId", "teamId", "createdT
 INSERT INTO "storyAssignees" ("storyId", "userId") VALUES 
 ('GSA-1', 'n0350204');
 
-INSERT INTO favorites ("userId", "url", "displayText") VALUES 
-('n0350204', '/stories/GSA-2', 'GSA-2'),
-('n0350204', '/stories/UND-2', 'UND-2');
+INSERT INTO favorites ("userId", "storyId") VALUES 
+('n0350204', 'GSA-2'),
+('n0350204', 'UND-2');

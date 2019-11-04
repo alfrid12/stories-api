@@ -64,6 +64,5 @@ CREATE TABLE "storyAssignees" (
 CREATE TABLE "favorites" (
     "id" SERIAL PRIMARY KEY,
     "userId" VARCHAR(100) NOT NULL,
-    "url" VARCHAR(200) NOT NULL,
-    "displayText" VARCHAR(100) NOT NULL
+    "storyId" VARCHAR(20) REFERENCES "stories"(id) NOT NULL
 );

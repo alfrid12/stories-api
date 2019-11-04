@@ -8,7 +8,14 @@ var jsonParser = bodyParser.json();
 /* GET home page. */
 router.get('/', (request, response) => response.render('index'));
 
-// Route for retrieving multiple stories
+
+
+
+
+///////////////////////////////////////////
+// Route for retrieving multiple stories //
+///////////////////////////////////////////
+
 router.get('/stories', (request, response) => {
 
     // Extract teamId from URL
@@ -22,11 +29,15 @@ router.get('/stories', (request, response) => {
             if (error) handleError(error);
             else response.send(result.rows);
         });
+
+    // If creatorId is specified, send stories created by that user
     } else if (creatorId) {
         DatabaseService.getStoriesByCreatorId(creatorId, (error, result) => {
             if (error) handleError(error);
             else response.send(result.rows);
         });
+    
+    //If assigneeId is specified, send stories assigned to that user
     } else if (assigneeId) {
         DatabaseService.getStoriesByAssigneeId(assigneeId, (error, result) => {
             if (error) handleError(error);
@@ -41,16 +52,59 @@ router.get('/stories', (request, response) => {
     });
 });
 
+
+
+
+
+
+
 // Route for retrieving individual story
 router.get('/stories/:storyId', (request, response) => {
 
     // Extract storyId from URL
     const storyId = request.params.storyId;
 
-    DatabaseService.getStoryById(storyId, (error, result) => {
-        if (error) handleError(error);
-        else response.send(result.rows[0]);
-    });
+    // Extract userId from request params
+    const userId = request.query.userId;
+
+    // If userId is specified, get favorite information along with story information
+    if (userId) {
+
+        const storyPromise = () => {
+            return new Promise((resolve, reject) => {
+                DatabaseService.getStoryById(storyId, (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result.rows[0]);
+                });
+            });
+        };
+
+        const favoritePromise = () => {
+            return new Promise((resolve, reject) => {
+                DatabaseService.getFavoriteByStoryIdAndUserId(storyId, userId, (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result.rows[0]);
+                });
+            });
+        };
+
+        Promise.all([storyPromise(), favoritePromise()]).then(results => {
+            const [story, favorite] = results;
+
+            let responseObject = {};
+
+            if (story) responseObject = story;
+
+            if (favorite) responseObject.isFavoritedByUser = true;
+
+            response.send(responseObject);
+        });
+    } else {
+        DatabaseService.getStoryById(storyId, (error, result) => {
+            if (error) handleError(error);
+            else response.send(result.rows[0]);
+        });
+    }
 });
 
 // Route for creating new story
@@ -120,6 +174,32 @@ router.get('/favorites/:userId', (request, response) => {
         if (error) handleError(error);
         else response.send(result.rows);
     });
+});
+
+router.post('/favorites', jsonParser, (request, response) => {
+
+    const storyId = request.body.storyId;
+    const userId = request.body.userId;
+
+    DatabaseService.addFavorite(storyId, userId, (error, insertResult) => {
+        if (error) handleError(error);
+        else response.send(insertResult);
+    });
+});
+
+
+router.delete('/favorites', (request, response) => {
+
+    // Check for query parameters in request URL
+    const storyId = request.query.storyId;
+    const userId = request.query.userId;
+
+    if (storyId && userId) {
+        DatabaseService.removeFavorite(storyId, userId, (error, deleteResult) => {
+            if (error) handleError(error);
+            else response.send(deleteResult);
+        });
+    } else response.end();
 });
 
 const handleError = error => console.log("ERROR: " + error);

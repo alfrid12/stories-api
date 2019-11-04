@@ -79,12 +79,37 @@ const getStoriesByAssigneeId = (assigneeId, callback) => {
 }
 
 const getStoryById = (storyId, callback) => {
-
     connectToDb(client => {
         let sql = `SELECT * FROM stories
                    WHERE stories.id = $1;`;
 
         client.query(sql, [storyId], (error, result) => {
+            client.end();
+            callback(error, result);
+        });
+    });
+}
+
+const getStoryByIdForUser = (storyId, userId, callback) => {
+    connectToDb(client => {
+        let sql = `SELECT * FROM stories INNER JOIN favorites
+                   ON stories.id = favorites."storyId" AND favorites."userId" = $2
+                   WHERE stories.id = $1;`;
+
+        client.query(sql, [storyId, userId], (error, result) => {
+            client.end();
+            callback(error, result);
+        });
+    });
+}
+
+const getFavoriteByStoryIdAndUserId = (storyId, userId, callback) => {
+    connectToDb(client => {
+        let sql = `SELECT * FROM favorites
+                   WHERE favorites."storyId" = $1 AND 
+                         favorites."userId" = $2;`;
+
+        client.query(sql, [storyId, userId], (error, result) => {
             client.end();
             callback(error, result);
         });
@@ -233,6 +258,29 @@ const getFavoritesByUserId = (userId, callback) => {
     });
 }
 
+const addFavorite = (storyId, userId, callback) => {
+    connectToDb(client => {
+        let sql = `INSERT INTO favorites ("storyId", "userId") VALUES ($1, $2);`;
+
+        client.query(sql, [storyId, userId], (error, response) => {
+            client.end();
+            callback(error, response);
+        });
+    });
+};
+
+const removeFavorite = (storyId, userId, callback) => {
+    connectToDb(client => {
+        let sql = `DELETE FROM favorites
+                   WHERE "storyId" = $1 AND
+                         "userId" = $2;`;
+
+        client.query(sql, [storyId, userId], (error, response) => {
+            client.end();
+            callback(error, response);
+        });
+    });
+};
 
 /////////////////
 //  UTILITIES  //
@@ -263,11 +311,15 @@ module.exports = {
     getStoriesByCreatorId,
     getStoriesByAssigneeId,
     getStoryById,
+    getStoryByIdForUser,
+    getFavoriteByStoryIdAndUserId,
     insertNewStory,
     updateExistingStory,
     getAllSprints,
     getSprintsByTeamId,
     insertNewSprint,
     getAllStoryStatuses,
-    getFavoritesByUserId
+    getFavoritesByUserId,
+    addFavorite,
+    removeFavorite
 };
